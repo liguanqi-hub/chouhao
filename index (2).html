@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1-6 转盘抽号程序</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .wheel {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 8px solid #333;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 30px;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+        
+        .section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid red;
+            z-index: 10;
+        }
+        
+        button {
+            padding: 12px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            font-size: 28px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>1-6 转盘抽号</h1>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <!-- 六个扇形区域将通过JS动态生成 -->
+            </div>
+        </div>
+        <button id="spinBtn">开始抽号</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const wheel = document.getElementById('wheel');
+            const spinBtn = document.getElementById('spinBtn');
+            const result = document.getElementById('result');
+            
+            // 创建转盘的6个扇形区域
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
+            const sections = 6;
+            
+            for (let i = 0; i < sections; i++) {
+                const section = document.createElement('div');
+                section.className = 'section';
+                section.style.backgroundColor = colors[i];
+                section.style.transform = `rotate(${i * 60}deg)`;
+                section.textContent = i + 1;
+                wheel.appendChild(section);
+            }
+            
+            let isSpinning = false;
+            
+            spinBtn.addEventListener('click', function() {
+                if (isSpinning) return;
+                
+                isSpinning = true;
+                result.textContent = '';
+                spinBtn.disabled = true;
+                
+                // 随机旋转角度 (5-10圈 + 随机停止位置)
+                const spinDegrees = 1800 + Math.floor(Math.random() * 1800) + (Math.floor(Math.random() * 6) * 60);
+                
+                wheel.style.transform = `rotate(${spinDegrees}deg)`;
+                
+                // 计算最终停止的数字
+                setTimeout(() => {
+                    const normalizedDegrees = spinDegrees % 360;
+                    const winningSection = 6 - Math.floor(normalizedDegrees / 60);
+                    const finalNumber = winningSection === 0 ? 6 : winningSection;
+                    
+                    result.textContent = `抽中号码: ${finalNumber}`;
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                }, 4000);
+            });
+        });
+    </script>
+</body>
+</html>
